@@ -1,7 +1,7 @@
 'use server';
 
-import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/outline";
 import { sql } from "@vercel/postgres";
+import { signIn } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -114,4 +114,20 @@ export async function deleteInvoice(id: string) {
     } catch (error) {
         return { message: 'Database Error: Failed to Delete Invoice.' };
     }
+}
+
+// Login
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', Object.fromEntries(formData));
+  } catch (error) {
+    if ((error as Error).message.includes('CredentialsSignIn')) {
+      return 'CredentialsSignin';
+    }
+
+    throw error;
+  }
 }
